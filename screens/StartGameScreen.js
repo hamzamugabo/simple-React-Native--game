@@ -1,17 +1,38 @@
 import React,{useState} from "react";
-import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, keyboard,KeyboardTypeAndroid} from "react-native";
+import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, Keyboard,KeyboardTypeAndroid} from "react-native";
 import Colors from "../constants/colors";
 import Input from "../componets/Input";
 
 const StartGameScreen = props => {
     const[enteredValue, setEnteredValue]= useState('');
+    const[confirmed, setConfirmed] = useState(false);
+    const[selectedNumber, setSelectedNumber] = useState('');
 
     const numberInputHandler = inputText =>{
         setEnteredValue(inputText.replace(/[^0-9]/g, ''));
     };
+
+    const resetInputHandler =() => {
+        setEnteredValue('');
+        setConfirmed(false);
+
+    };
+    const confirmInputHandler = ()=> {
+        const choosenNumber = parseInt(enteredValue);
+        if(choosenNumber === NaN || choosenNumber <= 0 || choosenNumber > 99){
+            return;
+        }
+        setConfirmed(true);
+        setSelectedNumber();
+        setEnteredValue('');
+    };
+    let confirmOutPut;
+    if(confirmed){
+        confirmOutPut = <Text> Choosen Number:{selectedNumber}</Text>
+    }
   return (
       <TouchableWithoutFeedback onPress={()=>{
-      keyboard.dismiss();
+      Keyboard.dismiss();
       }}>
     <View styles={styles.screen}>
       <Text style={styles.title}>Start a New Game</Text>
@@ -29,14 +50,15 @@ const StartGameScreen = props => {
         />
         <View style={styles.buttonContainer}>
           <View style={styles.button}>
-            <Button title="Reset" onPress={() => {}} color={Colors.blue} />
+            <Button title="Reset" onPress={resetInputHandler} color={Colors.blue} />
           </View>
 
           <View style={styles.button}>
-            <Button title="Confirm" onPress={() => {}} color={Colors.green} />
+            <Button title="Confirm" onPress={confirmInputHandler} color={Colors.green} />
           </View>
         </View>
       </View>
+      {confirmOutPut}
     </View>
     </TouchableWithoutFeedback>
   );
