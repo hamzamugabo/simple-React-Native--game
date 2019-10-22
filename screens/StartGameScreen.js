@@ -1,65 +1,88 @@
-import React,{useState} from "react";
-import { View, Text, StyleSheet, Button, TouchableWithoutFeedback, Keyboard,KeyboardTypeAndroid} from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+  KeyboardTypeAndroid
+} from "react-native";
 import Colors from "../constants/colors";
 import Input from "../componets/Input";
 
 const StartGameScreen = props => {
-    const[enteredValue, setEnteredValue]= useState('');
-    const[confirmed, setConfirmed] = useState(false);
-    const[selectedNumber, setSelectedNumber] = useState('');
+  const [enteredValue, setEnteredValue] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [selectedNumber, setSelectedNumber] = useState("");
 
-    const numberInputHandler = inputText =>{
-        setEnteredValue(inputText.replace(/[^0-9]/g, ''));
-    };
+  const numberInputHandler = inputText => {
+    setEnteredValue(inputText.replace(/[^0-9]/g, ""));
+  };
 
-    const resetInputHandler =() => {
-        setEnteredValue('');
-        setConfirmed(false);
-
-    };
-    const confirmInputHandler = ()=> {
-        const choosenNumber = parseInt(enteredValue);
-        if(choosenNumber === NaN || choosenNumber <= 0 || choosenNumber > 99){
-            return;
-        }
-        setConfirmed(true);
-        setSelectedNumber();
-        setEnteredValue('');
-    };
-    let confirmOutPut;
-    if(confirmed){
-        confirmOutPut = <Text> Choosen Number:{selectedNumber}</Text>
+  const resetInputHandler = () => {
+    setEnteredValue("");
+    setConfirmed(false);
+  };
+  const confirmInputHandler = () => {
+    const chosenNumber = parseInt(enteredValue);
+    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+      Alert.alert(
+        "Invalid Number!",
+        "The input number should be between 1-99",
+        [{ text: "Okay", style: "destructive", onPress: resetInputHandler }]
+      );
+      return;
     }
+    setConfirmed(true);
+    setSelectedNumber(chosenNumber);
+    setEnteredValue("");
+  };
+  let confirmOutPut;
+  if (confirmed) {
+    confirmOutPut = <Text> Choosen Number:{selectedNumber}</Text>;
+  }
   return (
-      <TouchableWithoutFeedback onPress={()=>{
-      Keyboard.dismiss();
-      }}>
-    <View styles={styles.screen}>
-      <Text style={styles.title}>Start a New Game</Text>
-      <View style={styles.inputContainer}>
-        <Text>Select a Number</Text>
-        <Input
-          style={styles.input}
-          blurOnSubmit
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="number-pad"
-          maxLength={2}
-          onChangeText={numberInputHandler}
-          value={enteredValue}
-        />
-        <View style={styles.buttonContainer}>
-          <View style={styles.button}>
-            <Button title="Reset" onPress={resetInputHandler} color={Colors.blue} />
-          </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View styles={styles.screen}>
+        <Text style={styles.title}>Start a New Game</Text>
+        <View style={styles.inputContainer}>
+          <Text>Select a Number</Text>
+          <Input
+            style={styles.input}
+            blurOnSubmit
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="number-pad"
+            maxLength={2}
+            onChangeText={numberInputHandler}
+            value={enteredValue}
+          />
+          <View style={styles.buttonContainer}>
+            <View style={styles.button}>
+              <Button
+                title="Reset"
+                onPress={resetInputHandler}
+                color={Colors.blue}
+              />
+            </View>
 
-          <View style={styles.button}>
-            <Button title="Confirm" onPress={confirmInputHandler} color={Colors.green} />
+            <View style={styles.button}>
+              <Button
+                title="Confirm"
+                onPress={confirmInputHandler}
+                color={Colors.green}
+              />
+            </View>
           </View>
         </View>
+        {confirmOutPut}
       </View>
-      {confirmOutPut}
-    </View>
     </TouchableWithoutFeedback>
   );
 };
