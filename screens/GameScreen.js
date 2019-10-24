@@ -1,77 +1,88 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {View, Text, StyleSheet, Button, Alert} from 'react-native';
-import NumberContainer from '../componets/NumberContainer';
-import Card from '../componets/Card';
+import React, { useState, useRef, useEffect } from "react";
+import { View, Text, StyleSheet, Button, Alert } from "react-native";
+import NumberContainer from "../componets/NumberContainer";
+import Card from "../componets/Card";
 
 const generateRandomBetween = (min, max, exclude) => {
-    min =  Math.ceil(min);
-    max = Math.floor(max);
-    const rndNum = Math.floor(Math.random() * (max-min)) + min ;
-    if(rndNum === exclude){
-        return generateRandomBetween(min,max, exclude);
-    }
-    else {
-        return rndNum;
-    }
-}; 
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  const rndNum = Math.floor(Math.random() * (max - min)) + min;
+  if (rndNum === exclude) {
+    return generateRandomBetween(min, max, exclude);
+  } else {
+    return rndNum;
+  }
+};  
 
 const GameScreen = props => {
-    const [currentGuess, setCurrentGuess] = useState(generateRandomBetween(1, 100, props.userChoice));
-    const [rounds, setRounds] = useState(0);
-    const currentLow = useRef(1);
-    const currentHigh= useRef(100);
-    const [userChoice, onGameOver] = props;
+  const [currentGuess, setCurrentGuess] = useState(
+    generateRandomBetween(1, 100, props.userChoice)
+  );
+  const [rounds, setRounds] = useState(0);
+  const currentLow = useRef(1);
+  const currentHigh = useRef(100);
+  const {userChoice, onGameOver} = props;
 
-    useEffect(( )=>{
-        if(currentGuess === props.userChoice){
-            props.onGameOver(rounds);
-        }
-    }, currentGuess, userChoice, onGameOver);
+  useEffect(
+    () => {
+      if (currentGuess === userChoice) {
+        onGameOver(rounds);
+      }
+    },[
+    currentGuess,
+    userChoice,
+    onGameOver] 
+  );
 
+  const nextGuessHandler = direction => {
+    if (
+      (direction === "lower" && currentGuess < props.userChoice) ||
+      (direction === "upper" && currentGuess > props.userChoice)
+    ) {
+      Alert.alert("Don't lie!", "You know this is wrong..", [
+        { text: "Sorry!", style: "cancel" }
+      ]);
+      return;
+    }
+    if (direction === "lower") {
+      currentHigh.current = currentGuess;
+    } else {
+      currentLow.current = currentGuess;
+    }
+    const nextNumber = generateRandomBetween(
+      currentLow.current,
+      currentHigh.current,
+      currentGuess
+    );
+    setCurrentGuess(nextNumber);
+    setRounds(curRounds => curRounds + 1);
+  };
 
-    const nextGuessHandler = direction => {
-        if((direction === 'lower' && currentGuess<props.userChoice) || (direction === 'upper' && currentGuess>props.userChoice))
-        {
-            Alert.alert('Don\'t lie!','You know this is wrong..',[{text:'Sorry!', style:'cancel'}]);
-            return;
-        }
-        if(direction === 'lower'){
-            currentHigh.current = currentGuess;
-        }
-        else{
-            currentLow.current = currentGuess;
-        }
-        const nextNumber = generateRandomBetween(currentLow.current,currentHigh.current, currentGuess);
-        setCurrentGuess(nextNumber);
-        setRounds(curRounds => curRounds + 1);
-    };
-
-    return (
+  return (
     <View style={styles.screen}>
-        <Text>opponet's Guess</Text>
-        <NumberContainer>{currentGuess}</NumberContainer>
-        <Card style={styles.buttonContainer}>
-            <Button title="LOWER" onPress={nextGuessHandler.bind(this, 'lower')}/>
-            <Button title="UPPER" onPress={nextGuessHandler.bind(this, 'upper')}/>
-
-        </Card>
-    </View>);
-}
+      <Text>opponet's Guess</Text>
+      <NumberContainer>{currentGuess}</NumberContainer>
+      <Card style={styles.buttonContainer}>
+        <Button title="LOWER" onPress={nextGuessHandler.bind(this, "lower")} />
+        <Button title="GREATER" onPress={nextGuessHandler.bind(this, "greater")} />
+      </Card>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    screen:{
-        flex:1,
-        alignItems:'center',
-        padding:10
-
-    },
-    buttonContainer:{
-        flexDirection:'row',
-        justifyContent:"space-around",
-        marginTop:20,
-        width:300,
-        maxWidth:'80%'
-    }
+  screen: {
+    flex: 1,
+    alignItems: "center",
+    padding: 10
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    width: 300,
+    maxWidth: "80%"
+  }
 });
 
 export default GameScreen;
